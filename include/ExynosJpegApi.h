@@ -1,6 +1,6 @@
 /*
  * Copyright Samsung Electronics Co.,LTD.
- * Copyright (C) 2012~2013 The Android Open Source Project
+ * Copyright (C) 2012 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@
 #ifndef __EXYNOS_JPEG_BASE_H__
 #define __EXYNOS_JPEG_BASE_H__
 
-#include "videodev2.h"
-#include "videodev2_exynos_media.h"
+#include <linux/videodev2.h>
+#include <linux/videodev2_exynos_media.h>
 
 #define JPEG_CACHE_OFF (0)
 #define JPEG_CACHE_ON (1)
@@ -29,6 +29,7 @@
 
 class ExynosJpegBase {
 public:
+    ;
     #define JPEG_MAX_PLANE_CNT          (3)
     ExynosJpegBase();
     virtual ~ExynosJpegBase();
@@ -91,16 +92,21 @@ public:
     struct CONFIG{
         int               mode;
         int               enc_qual;
+
         int               width;
         int               height;
         int               scaled_width;
         int               scaled_height;
+
         int               numOfPlanes;
+
         int               sizeJpeg;
+
         union {
             PIX_FMT enc_fmt;
             PIX_FMT dec_fmt;
         } pix;
+
         int              reserved[8];
     };
 
@@ -111,13 +117,14 @@ public:
     int ckeckJpegSelct(enum MODE eMode);
 
 protected:
+    // variables
     bool t_bFlagCreate;
     bool t_bFlagCreateInBuf;
     bool t_bFlagCreateOutBuf;
     bool t_bFlagExcute;
     bool t_bFlagSelect;
     int t_iCacheValue;
-    int t_iSelectNode;
+    int t_iSelectNode; // 0:auto , 1:fimp , 2:hx or fimp2;
     int t_iPlaneNum;
     int t_iJpegFd;
 
@@ -125,6 +132,7 @@ protected:
     struct BUFFER t_stJpegInbuf;
     struct BUFFER t_stJpegOutbuf;
 
+    //functions
     int t_v4l2Querycap(int iFd);
     int t_v4l2SetJpegcomp(int iFd, int iQuality);
     int t_v4l2SetFmt(int iFd, enum v4l2_buf_type eType, struct CONFIG *pstConfig);
@@ -160,11 +168,13 @@ protected:
     int execute(int iInBufPlanes, int iOutBufPlanes);
 };
 
-/*
- * ExynosJpegEncoder class
+//! ExynosJpegEncoder class
+/*!
+ * \ingroup Exynos
  */
 class ExynosJpegEncoder : public ExynosJpegBase {
 public:
+    ;
     ExynosJpegEncoder();
     virtual ~ExynosJpegEncoder();
 
@@ -177,76 +187,78 @@ public:
         QUALITY_LEVEL_6,        /* low */
     };
 
-    int create(void);
-    int destroy(void);
+    int     create(void);
+    int     destroy(void);
 
-    int setJpegConfig(void* pConfig);
+    int     setJpegConfig(void* pConfig);
 
-    int checkInBufType(void);
-    int checkOutBufType(void);
+    int     checkInBufType(void);
+    int     checkOutBufType(void);
 
-    int getInBuf(int *piBuf, int *piInputSize, int iSize);
-    int getOutBuf(int *piBuf, int *piOutputSize);
+    int     getInBuf(int *piBuf, int *piInputSize, int iSize);
+    int     getOutBuf(int *piBuf, int *piOutputSize);
 
-    int setInBuf(int *piBuf, int *iSize);
-    int setOutBuf(int iBuf, int iSize);
+    int     setInBuf(int *piBuf, int *iSize);
+    int     setOutBuf(int iBuf, int iSize);
 
-    int getInBuf(char **pcBuf, int *piInputSize, int iSize);
-    int getOutBuf(char **pcBuf, int *piOutputSize);
+    int     getInBuf(char **pcBuf, int *piInputSize, int iSize);
+    int     getOutBuf(char **pcBuf, int *piOutputSize);
 
-    int setInBuf(char **pcBuf, int *iSize);
-    int setOutBuf(char *pcBuf, int iSize);
+    int     setInBuf(char **pcBuf, int *iSize);
+    int     setOutBuf(char *pcBuf, int iSize);
 
-    int getSize(int *piWidth, int *piHeight);
-    int getColorFormat(void);
-    int setColorFormat(int iV4l2ColorFormat);
-    int setJpegFormat(int iV4l2JpegFormat);
-    int setColorBufSize(int *piBufSize, int iSize);
-    int updateConfig(void);
+    int     getSize(int *piWidth, int *piHeight);
+    int     getColorFormat(void);
+    int     setColorFormat(int iV4l2ColorFormat);
+    int     setJpegFormat(int iV4l2JpegFormat);
+    int     setColorBufSize(int *piBufSize, int iSize);
+    int     updateConfig(void);
 
-    int setQuality(int iQuality);
-    int getJpegSize(void);
+    int     setQuality(int iQuality);
+    int     getJpegSize(void);
 
-    int encode(void);
+    int     encode(void);
 };
 
-/*
- * ExynosJpegDecoder class
+//! ExynosJpegDecoder class
+/*!
+ * \ingroup Exynos
  */
 class ExynosJpegDecoder : public ExynosJpegBase {
 public:
+    ;
     ExynosJpegDecoder();
     virtual ~ExynosJpegDecoder();
 
-    int create(void);
-    int destroy(void);
+    int     create(void);
+    int     destroy(void);
 
-    int setJpegConfig(void* pConfig);
+    int     setJpegConfig(void* pConfig);
 
-    int checkInBufType(void);
-    int checkOutBufType(void);
+    int     checkInBufType(void);
+    int     checkOutBufType(void);
 
-    int getInBuf(int *piBuf, int *piInputSize);
-    int getOutBuf(int *picBuf, int *piOutputSize, int iSize);
+    int     getInBuf(int *piBuf, int *piInputSize);
+    int     getOutBuf(int *picBuf, int *piOutputSize, int iSize);
 
-    int setInBuf(int iBuf, int iSize);
-    int setOutBuf(int *piBuf, int *iSize);
+    int     setInBuf(int iBuf, int iSize);
+    int     setOutBuf(int *piBuf, int *iSize);
 
-    int getInBuf(char **pcBuf, int *piInputSize);
-    int getOutBuf(char **pcBuf, int *piOutputSize, int iSize);
+    int     getInBuf(char **pcBuf, int *piInputSize);
+    int     getOutBuf(char **pcBuf, int *piOutputSize, int iSize);
 
-    int setInBuf(char *pcBuf, int iSize);
-    int setOutBuf(char **pcBuf, int *iSize);
+    int     setInBuf(char *pcBuf, int iSize);
+    int     setOutBuf(char **pcBuf, int *iSize);
 
-    int getSize(int *piWidth, int *piHeight);
-    int setColorFormat(int iV4l2ColorFormat);
-    int setJpegFormat(int iV4l2JpegFormat);
-    int updateConfig(void);
+    int     getSize(int *piWidth, int *piHeight);
+    int     setColorFormat(int iV4l2ColorFormat);
+    int     setJpegFormat(int iV4l2JpegFormat);
+    int     updateConfig(void);
 
     int setScaledSize(int iW, int iH);
     int setJpegSize(int iJpegSize);
 
-    int decode(void);
+    int  decode(void);
 };
 
 #endif /* __EXYNOS_JPEG_BASE_H__ */

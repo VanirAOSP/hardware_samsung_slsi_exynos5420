@@ -1,6 +1,6 @@
 /*
  * Copyright Samsung Electronics Co.,LTD.
- * Copyright (C) 2013 The Android Open Source Project
+ * Copyright (C) 2012 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,19 +29,23 @@
 #include <signal.h>
 #include <math.h>
 #include <sys/poll.h>
+
 #include <cutils/log.h>
+
 #include <utils/Log.h>
 
 #include "ExynosJpegApi.h"
 
-#define JPEG_ERROR_LOG(fmt,...) ALOGE(fmt,##__VA_ARGS__)
+#define JPEG_ERROR_LOG(fmt,...)
 
 #define NUM_JPEG_DEC_IN_PLANES (1)
 #define NUM_JPEG_DEC_OUT_PLANES (1)
+
 #define NUM_JPEG_DEC_IN_BUFS (1)
 #define NUM_JPEG_DEC_OUT_BUFS (1)
 
-#define MAXIMUM_JPEG_SIZE(n) ((65535 - (n)) * 32768)
+#define MAX_JPG_WIDTH (8192)
+#define MAX_JPG_HEIGHT (8192)
 
 ExynosJpegDecoder::ExynosJpegDecoder()
 {
@@ -82,8 +86,8 @@ int ExynosJpegDecoder::checkOutBufType(void)
 
 int ExynosJpegDecoder::getInBuf(char **pcBuf, int *piInputSize)
 {
-    return getBuf(t_bFlagCreateInBuf, &t_stJpegInbuf, pcBuf, piInputSize,
-                    NUM_JPEG_DEC_IN_PLANES, NUM_JPEG_DEC_IN_PLANES);
+    return getBuf(t_bFlagCreateInBuf, &t_stJpegInbuf, pcBuf, piInputSize, \
+                        NUM_JPEG_DEC_IN_PLANES, NUM_JPEG_DEC_IN_PLANES);
 }
 
 int ExynosJpegDecoder::getOutBuf(char **pcBuf, int *piOutputSize, int iSize)
@@ -115,8 +119,8 @@ int  ExynosJpegDecoder::setOutBuf(char **pcBuf, int *iSize)
 
 int ExynosJpegDecoder::getInBuf(int *piBuf, int *piInputSize)
 {
-    return getBuf(t_bFlagCreateInBuf, &t_stJpegInbuf, piBuf, piInputSize,
-                    NUM_JPEG_DEC_IN_PLANES, NUM_JPEG_DEC_IN_PLANES);
+    return getBuf(t_bFlagCreateInBuf, &t_stJpegInbuf, piBuf, piInputSize, \
+                        NUM_JPEG_DEC_IN_PLANES, NUM_JPEG_DEC_IN_PLANES);
 }
 
 int ExynosJpegDecoder::getOutBuf(int *piBuf, int *piOutputSize, int iSize)
@@ -175,33 +179,20 @@ int ExynosJpegDecoder::setJpegFormat(int iV4l2JpegFormat)
 
 int ExynosJpegDecoder::updateConfig(void)
 {
-    return ExynosJpegBase::updateConfig(MODE_DECODE,
-                    NUM_JPEG_DEC_IN_BUFS, NUM_JPEG_DEC_OUT_BUFS,
-                    NUM_JPEG_DEC_IN_PLANES, NUM_JPEG_DEC_OUT_PLANES);
+    return ExynosJpegBase::updateConfig(MODE_DECODE, \
+        NUM_JPEG_DEC_IN_BUFS, NUM_JPEG_DEC_OUT_BUFS, \
+        NUM_JPEG_DEC_IN_PLANES, NUM_JPEG_DEC_OUT_PLANES);
 }
 
 int ExynosJpegDecoder::setScaledSize(int iW, int iH)
 {
-    int mcu_x_size = 0;
-
     if (t_bFlagCreate == false)
         return ERROR_JPEG_DEVICE_NOT_CREATE_YET;
 
-    switch (t_stJpegConfig.pix.enc_fmt.out_fmt) {
-    case V4L2_PIX_FMT_JPEG_444:
-    case V4L2_PIX_FMT_JPEG_GRAY:
-        mcu_x_size = 8;
-        break;
-    case V4L2_PIX_FMT_JPEG_422:
-    case V4L2_PIX_FMT_JPEG_420:
-        mcu_x_size = 16;
-        break;
-    default:
-        mcu_x_size = 8;
-        break;
-    }
+    if (iW < 0 || MAX_JPG_WIDTH < iW)
+        return ERROR_INVALID_IMAGE_SIZE;
 
-    if (iH < 0 || iW < 0 || (iW * iH) > MAXIMUM_JPEG_SIZE(mcu_x_size))
+    if (iH < 0 || MAX_JPG_HEIGHT < iH)
         return ERROR_INVALID_IMAGE_SIZE;
 
     t_stJpegConfig.scaled_width = iW;
