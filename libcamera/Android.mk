@@ -31,6 +31,7 @@ LOCAL_CFLAGS += -DGAIA_FW_BETA
 LOCAL_CFLAGS += -DUSE_CAMERA_ESD_RESET
 
 LOCAL_C_INCLUDES += \
+	$(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr/include \
 	$(LOCAL_PATH)/../include \
 	$(LOCAL_PATH)/../libcamera \
 	$(TOP)/hardware/samsung_slsi/exynos/include \
@@ -55,6 +56,9 @@ LOCAL_SRC_FILES:= \
 
 LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE := libexynoscamera
+
+LOCAL_ADDITIONAL_DEPENDENCIES += \
+	$(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr
 
 include $(BUILD_SHARED_LIBRARY)
 
