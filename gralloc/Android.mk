@@ -33,7 +33,7 @@ LOCAL_SRC_FILES := 	\
 	mapper.cpp
 
 LOCAL_MODULE := gralloc.exynos5
-LOCAL_CFLAGS:= -DLOG_TAG=\"gralloc\"
+LOCAL_CFLAGS:= -fno-strict-aliasing -Wno-error=strict-aliasing -DLOG_TAG=\"gralloc\"
 LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE_OWNER := samsung_arm
 
