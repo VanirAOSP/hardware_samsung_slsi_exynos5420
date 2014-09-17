@@ -29,6 +29,8 @@
 
 #include <linux/fb.h>
 
+#define GRALLOC_USAGE_PRIVATE_NONSECURE 0x02000000
+
 /*****************************************************************************/
 
 struct private_module_t;
